@@ -3,6 +3,8 @@ use std::fs::{self, File};
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 #[derive(Debug)]
 struct Block {
     content: String,
@@ -288,7 +290,12 @@ fn process_directory(src_dir: &Path, tgt_dir: &Path) -> Result<(), Box<dyn std::
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
-    
+
+    if args.len() == 2 && args[1] == "--version" {
+        println!("lean2md version {}", VERSION);
+        return Ok(());
+    }    
+
     if args.len() != 3 {
         println!("Usage: lean2md <lean_src_dir> <md_tgt_dir>");
         return Ok(());

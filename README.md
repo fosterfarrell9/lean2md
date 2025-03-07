@@ -1,6 +1,6 @@
 # lean2md
 
-A command-line tool that converts Lean theorem prover files (`.lean`) to Markdown (`.md`) documents, preserving code structure and comments.
+A command-line tool that converts Lean files (`.lean`) to Markdown (`.md`) documents, preserving code structure and comments.
 
 ## Description
 
@@ -21,9 +21,10 @@ git clone https://github.com/yourusername/lean2md.git
 cd lean2md
 # Build the project
 cargo build --release
-
 # The executable will be in target/release/lean2md
 ```
+
+You might consider adding the `target/relase` folder to your PATH to run `lean2md` from any directory.
 
 ## Usage
 
@@ -48,7 +49,7 @@ cargo run -- <lean_src_dir> <md_tgt_dir>
 
 ## Features
 
-- Converts Lean comments (/- ... -/) to Markdown text
+- Converts Lean comments `/- ... -/` to Markdown text
 - Maintains Lean code blocks inside Markdown code fences
 - Preserves directory structure from source to target
 - Special handling for docstrings and custom markers
