@@ -73,3 +73,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Acknowledgments
+
+This project was inspired by and builds upon the work of:
+
+- [Seasawher/mdgen](https://github.com/Seasawher/mdgen) - An excellent tool for generating Markdown from Lean files in Lean itself
+- [arthurpaulino/lean2md](https://github.com/arthurpaulino/lean2md) - The original lean2md that provided the blueprint for this implementation
+
+Thanks to the authors of these projects for their work in Lean documentation tooling.
