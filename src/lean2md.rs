@@ -38,6 +38,18 @@ fn build_blocks(content: &str) -> Result<Vec<Block>, String> {
             continue;
         }
 
+        // Special handling for lines ending with --!
+        if line.ends_with("--!") {
+            // Extract content without the --! suffix and trim trailing whitespace
+            let content = line[..line.len()-3].trim_end().to_string();
+
+            // Add this line directly to the current content block
+            current_content.push_str(&content);
+            current_content.push('\n');
+
+            continue; // Skip further processing for this line
+        }
+
         // Check for code block markers inside comments
         if in_comment_block && line.trim() == "```lean" {
             in_code_example = true;
