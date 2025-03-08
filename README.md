@@ -62,6 +62,8 @@ cargo run -- <lean_src_dir> <md_tgt_dir>
 - `--+`  at the end of a docstring: The docstring is formatted as an admonish block
 - `--!` at the end of a line: Forces the line to be included in the output even if it would normally be filtered out
 
+Note: Marker precedence matters. Content within `--#--` ignore blocks will always be ignored, regardless of other markers like `--!`.
+
 ## Project Structure
 
 - `src/lean2md.rs`: Main entry point and processing logic
