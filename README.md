@@ -60,6 +60,7 @@ cargo run -- <lean_src_dir> <md_tgt_dir>
 - `--#` at the end of a line: Ignores the entire line
 - `--#--`: Lines between two `--#--` markers are completely ignored
 - `--+`  at the end of a docstring: The docstring is formatted as an admonish block
+- `--!` at the end of a line: Forces the line to be included in the output even if it would normally be filtered out
 
 ## Project Structure
 
