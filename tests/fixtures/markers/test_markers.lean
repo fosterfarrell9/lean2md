@@ -1,7 +1,7 @@
 /-
 This is a test file for markers
-The next line should be excluded from the output:
-@[simp] --#
+The next line should be excluded from the output because it ends with the --+ marker:
+Be gone --#
 But this line should be included despite having --#: --#--!
 The next line is a normal line with --!
 This should appear in output --!

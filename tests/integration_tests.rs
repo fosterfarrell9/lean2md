@@ -1,4 +1,5 @@
 use std::fs;
+use pretty_assertions::assert_eq;
 
 fn run_fixture_test(fixture_name: &str) {
     // Create temporary directories
@@ -30,7 +31,7 @@ fn run_fixture_test(fixture_name: &str) {
         .replace("\r\n", "\n");
 
     // Compare with nice diff
-    similar_asserts::assert_str_eq!(actual.trim(), expected.trim(),
+    assert_eq!(actual.trim(), expected.trim(),
         "Test failed for {}", fixture_name);
 }
 
@@ -40,56 +41,21 @@ fn test_admonish() {
 }
 
 #[test]
+fn test_docstrings() {
+    run_fixture_test("docstrings");
+}
+
+#[test]
+fn test_ignore_blocks() {
+    run_fixture_test("ignore_blocks");
+}
+
+#[test]
+fn test_markers() {
+    run_fixture_test("markers");
+}
+
+#[test]
 fn test_nested_code() {
     run_fixture_test("nested_code");
-}
-
-
-#[test]
-fn test_end_to_end_conversion() {
-    // Create temporary directories
-    let temp_in = tempfile::tempdir().unwrap();
-    let temp_out = tempfile::tempdir().unwrap();
-
-    // Copy test files to temp directory
-    fs::write(
-        temp_in.path().join("test.lean"),
-        "/- Test comment\nWith multiple lines -/\ndef example := 42"
-    ).unwrap();
-
-    // Run the conversion
-    assert!(lean2md::process_directory(temp_in.path(), temp_out.path()).is_ok());
-
-    // Verify output
-    let output = fs::read_to_string(temp_out.path().join("test.md")).unwrap();
-    assert!(output.contains("Test comment"));
-    assert!(output.contains("```lean\ndef example := 42\n```"));
-}
-
-#[test]
-fn test_marker_handling() {
-    // Create temporary directories
-    let temp_in = tempfile::tempdir().unwrap();
-    let temp_out = tempfile::tempdir().unwrap();
-
-    // Copy fixture file
-    let fixture_path = "tests/fixtures/markers/test_markers.lean";
-    let fixture_content = fs::read_to_string(fixture_path).unwrap();
-    fs::write(temp_in.path().join("test_markers.lean"), fixture_content).unwrap();
-
-    // Run the conversion
-    lean2md::process_directory(temp_in.path(), temp_out.path()).unwrap();
-
-    // Read the actual output and normalize line endings
-    let actual = fs::read_to_string(temp_out.path().join("test_markers.md"))
-        .unwrap()
-        .replace("\r\n", "\n");
-
-    // Read the expected output and normalize line endings
-    let expected = fs::read_to_string("tests/fixtures/markers/expected_markers.md")
-        .unwrap()
-        .replace("\r\n", "\n");
-
-    // Compare with nice diff using similar_asserts
-    similar_asserts::assert_str_eq!(actual.trim(), expected.trim());
 }

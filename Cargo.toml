@@ -13,6 +13,6 @@ path = "src/main.rs"
 
 [dev-dependencies]
 tempfile = "3.3.0"  # For creating temp directories in tests
-similar-asserts = "1.4.2"  # For better diff in test failures
+pretty_assertions = "1.4.0"  # For better diff in test failures
 
 [dependencies]

@@ -31,14 +31,15 @@ You might consider adding the `target/relase` folder to your PATH to run `lean2m
 Basic usage:
 
 ```bash
-lean2md <lean_src_dir> <md_tgt_dir>
+lean2md <lean_src_dir> <md_tgt_dir>     # Convert Lean files to Markdown
+lean2md --version                       # Display version information
 ```
 
 Example:
 
 ```bash
-# Convert all .lean files in the PlaneGeometry directory to .md files in the docs directory
-lean2md PlaneGeometry docs
+# Convert all .lean files in the Geometry directory to .md files in the docs directory
+lean2md Geometry docs
 ```
 
 When running with cargo:
@@ -62,12 +63,52 @@ cargo run -- <lean_src_dir> <md_tgt_dir>
 - `--+`  at the end of a docstring: The docstring is formatted as an admonish block
 - `--!` at the end of a line: Forces the line to be included in the output even if it would normally be filtered out
 
+### Comment handling:
+- Regular comments `/- ... -/`: Delimiters are removed in the output
+- Docstrings `/-- ... -/`: Delimiters are preserved in the output and included in code blocks (unless the docstring is followed by `--+`)
+
 Note: Marker precedence matters. Content within `--#--` ignore blocks will always be ignored, regardless of other markers like `--!`.
 
 ## Project Structure
 
-- `src/lean2md.rs`: Main entry point and processing logic
-- `Cargo.toml`: Project configuration and dependencies
+- `src/lean2md_core.rs`: Core functionality for converting Lean to Markdown
+- `src/lib.rs`: Library interface that exports public functions
+- `src/main.rs`: Command-line interface
+- `tests/integration_tests.rs`: End-to-end tests
+- `tests/fixtures/`: Test fixtures for various features
+
+## Testing
+
+The project includes both unit tests and integration tests:
+
+- **Unit tests**: Located in `src/lean2md_core.rs`, they verify individual components like block parsing and marker handling.
+
+- **Integration tests**: Located in `tests/integration_tests.rs`, they test end-to-end conversion using fixture files.
+
+### Running Tests
+
+```bash
+# Run all tests
+cargo test
+
+# Run a specific test
+cargo test test_markers
+```
+
+### Test Fixtures
+
+Test fixtures are organized in `fixtures` with the following structure:
+
+tests/fixtures/
+  ├── admonish/
+  │   ├── test_admonish.lean      # Input fixture
+  │   └── expected_admonish.md    # Expected output
+  ├── docstrings/
+  ├── ignore_blocks/
+  ├── markers/
+  └── nested_code/
+
+To add a new test case, create a new fixture directory with both input `.lean` and expected `.md` files, then add a test function in `integration_tests.rs` that calls `run_fixture_test()` with your fixture name.
 
 ## License
 

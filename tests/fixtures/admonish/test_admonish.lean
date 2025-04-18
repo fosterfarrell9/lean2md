@@ -1,5 +1,5 @@
-/-- This is a docstring that should be an admonish block -/ --+
-def example := 42
+/-- This is a docstring that should become an admonish block. -/ --+
+def important := 42
 
-/-- This is a regular docstring -/
+/-- This is a regular docstring and should be kept. -/
 def regular := 100
