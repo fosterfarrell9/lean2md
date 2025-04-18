@@ -1,18 +1,43 @@
-use std::env;
 use std::fs::{self, File};
 use std::io::{self, Read, Write};
-use std::path::{Path, PathBuf};
-
-const VERSION: &str = env!("CARGO_PKG_VERSION");
+use std::path::Path;
 
 #[derive(Debug)]
-struct Block {
+pub struct Block {
     content: String,
     is_code: bool,
     is_admonish: bool,
 }
 
-fn build_blocks(content: &str) -> Result<Vec<Block>, String> {
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_build_blocks_basic() {
+        let input = "/- Simple comment -/\ndef foo := 1";
+        let blocks = build_blocks(input).unwrap();
+        assert_eq!(blocks.len(), 2);
+        assert!(!blocks[0].is_code);
+        assert!(blocks[1].is_code);
+    }
+
+    #[test]
+    fn test_ignore_marker() {
+        let input = "line 1\nline 2 --#\nline 3";
+        let blocks = build_blocks(input).unwrap();
+        assert!(!blocks[0].content.contains("line 2"));
+    }
+
+    #[test]
+    fn test_force_include_marker() {
+        let input = "line 1\nline 2 --#--!\nline 3";
+        let blocks = build_blocks(input).unwrap();
+        assert!(blocks[0].content.contains("line 2 --#"));
+    }
+}
+
+pub fn build_blocks(content: &str) -> Result<Vec<Block>, String> {
     let mut blocks = Vec::new();
     let mut current_content = String::new();
     let mut in_comment_block = false;
@@ -271,7 +296,7 @@ fn lean_file_2_md(filename: &Path) -> Result<String, io::Error> {
 }
 
 // New function to recursively process directories
-fn process_directory(src_dir: &Path, tgt_dir: &Path) -> Result<(), Box<dyn std::error::Error>> {
+pub fn process_directory(src_dir: &Path, tgt_dir: &Path) -> Result<(), Box<dyn std::error::Error>> {
     // Create the target directory if it doesn't exist
     fs::create_dir_all(tgt_dir)?;
 
@@ -301,27 +326,6 @@ fn process_directory(src_dir: &Path, tgt_dir: &Path) -> Result<(), Box<dyn std::
             file.write_all(md_content.as_bytes())?;
         }
     }
-
-    Ok(())
-}
-
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args: Vec<String> = env::args().collect();
-
-    if args.len() == 2 && args[1] == "--version" {
-        println!("lean2md version {}", VERSION);
-        return Ok(());
-    }
-
-    if args.len() != 3 {
-        println!("Usage: lean2md <lean_src_dir> <md_tgt_dir>");
-        return Ok(());
-    }
-
-    let src = PathBuf::from(&args[1]);
-    let tgt = PathBuf::from(&args[2]);
-
-    process_directory(&src, &tgt)?;
 
     Ok(())
 }

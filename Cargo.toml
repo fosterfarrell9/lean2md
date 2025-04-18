@@ -3,8 +3,16 @@ name = "lean2md"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "lean2md"
+path = "src/lib.rs"
+
 [[bin]]
 name = "lean2md"
-path = "src/lean2md.rs"
+path = "src/main.rs"
+
+[dev-dependencies]
+tempfile = "3.3.0"  # For creating temp directories in tests
+pretty_assertions = "1.4.0"  # For better diff in test failures
 
 [dependencies]
