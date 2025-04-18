@@ -99,6 +99,7 @@ cargo test test_markers
 
 Test fixtures are organized in `fixtures` with the following structure:
 
+```
 tests/fixtures/
   ├── admonish/
   │   ├── test_admonish.lean      # Input fixture
@@ -107,6 +108,7 @@ tests/fixtures/
   ├── ignore_blocks/
   ├── markers/
   └── nested_code/
+```
 
 To add a new test case, create a new fixture directory with both input `.lean` and expected `.md` files, then add a test function in `integration_tests.rs` that calls `run_fixture_test()` with your fixture name.
 
