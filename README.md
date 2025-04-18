@@ -69,6 +69,8 @@ cargo run -- <lean_src_dir> <md_tgt_dir>
 
 Note: Marker precedence matters. Content within `--#--` ignore blocks will always be ignored, regardless of other markers like `--!`.
 
+For concrete examples of how these features and markers work in practice, see the test fixtures in the `tests/fixtures/` directory. Each fixture contains input Lean files and their expected Markdown output, demonstrating how different markers and features behave.
+
 ## Project Structure
 
 - `src/lean2md_core.rs`: Core functionality for converting Lean to Markdown
