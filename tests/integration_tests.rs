@@ -30,9 +30,49 @@ fn run_fixture_test(fixture_name: &str) {
         .unwrap_or_else(|_| panic!("Failed to read expected output for {}", fixture_name))
         .replace("\r\n", "\n");
 
-    // Compare with nice diff
+    // Compare markdown content
     assert_eq!(actual.trim(), expected.trim(),
-        "Test failed for {}", fixture_name);
+        "Markdown test failed for {}", fixture_name);
+
+    // Check for expected quiz files if they exist
+    let quizzes_dir = fs::read_dir(&fixture_dir).unwrap();
+    for entry in quizzes_dir {
+        let entry = entry.unwrap();
+        let path = entry.path();
+
+        // Look for expected_*.toml files
+        if let Some(filename) = path.file_name() {
+            let filename = filename.to_string_lossy();
+            if filename.starts_with("expected_") && filename.ends_with(".toml") {
+                // Extract quiz name
+                let quiz_name = filename
+                    .strip_prefix("expected_")
+                    .unwrap()
+                    .strip_suffix(".toml")
+                    .unwrap();
+
+                // Check if generated quiz file exists
+                let generated_quiz_path = temp_out.path().parent().unwrap()
+                    .join("quizzes")
+                    .join(format!("{}.toml", quiz_name));
+
+                assert!(generated_quiz_path.exists(),
+                    "Quiz file {} not generated", quiz_name);
+
+                // Compare content
+                let expected_quiz = fs::read_to_string(&path)
+                    .unwrap_or_else(|_| panic!("Failed to read expected quiz: {}", path.display()))
+                    .replace("\r\n", "\n");
+
+                let actual_quiz = fs::read_to_string(&generated_quiz_path)
+                    .unwrap_or_else(|_| panic!("Failed to read generated quiz: {}", generated_quiz_path.display()))
+                    .replace("\r\n", "\n");
+
+                assert_eq!(actual_quiz.trim(), expected_quiz.trim(),
+                    "Quiz content mismatch for {}", quiz_name);
+            }
+        }
+    }
 }
 
 #[test]
@@ -59,3 +99,9 @@ fn test_markers() {
 fn test_nested_code() {
     run_fixture_test("nested_code");
 }
+
+#[test]
+fn test_quizzes() {
+    run_fixture_test("quizzes");
+}
+
