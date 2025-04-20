@@ -374,6 +374,12 @@ pub fn process_directory(src_dir: &Path, tgt_dir: &Path) -> Result<(), Box<dyn s
                 // Process lean file
                 let content = fs::read_to_string(&path)?;
 
+                // Get the output path
+                let md_path = tgt_dir.join(path.file_stem().unwrap()).with_extension("md");
+
+                // Display progress information
+                println!("Converting {} to {}", path.display(), md_path.display());
+
                 // Parse blocks and extract quizzes
                 let (blocks, quizzes) = build_blocks(&content)?;
 
@@ -383,12 +389,14 @@ pub fn process_directory(src_dir: &Path, tgt_dir: &Path) -> Result<(), Box<dyn s
                 // Write quiz TOML files
                 for (name, content) in quizzes {
                     let quiz_path = quizzes_dir.join(format!("{}.toml", name));
-                    let mut file = File::create(quiz_path)?;
+                    let mut file = File::create(&quiz_path)?;
                     file.write_all(content.as_bytes())?;
+
+                    // Also show when a quiz file is created
+                    println!("  Generated quiz: {}", quiz_path.display());
                 }
 
                 // Create output markdown file
-                let md_path = tgt_dir.join(path.file_stem().unwrap()).with_extension("md");
                 fs::write(md_path, markdown)?;
             }
         }
