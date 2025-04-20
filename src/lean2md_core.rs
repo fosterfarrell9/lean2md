@@ -2,6 +2,12 @@ use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
 
+/// A (quiz_name, quiz_content) pair.
+type Quiz = (String, String);
+
+/// The result of parsing: blocks plus extracted quizzes.
+type BlocksResult = Result<(Vec<Block>, Vec<Quiz>), String>;
+
 #[derive(Debug)]
 /// Represents a block of content extracted from a Lean file
 pub struct Block {
@@ -51,16 +57,22 @@ mod tests {
     }
 }
 
-/// Parses a Lean file content into blocks and quizzes
+/// Parses a Lean file’s text into output blocks plus any quizzes.
 ///
 /// # Arguments
 ///
-/// * `content` - String content of a Lean file
+/// * `content` – the full contents of a Lean source file
 ///
 /// # Returns
 ///
-/// Result containing a tuple of (blocks, quizzes) or an error message
-pub fn build_blocks(content: &str) -> Result<(Vec<Block>, Vec<(String, String)>), String> {
+/// `BlocksResult`
+///
+/// On success, returns `(blocks, quizzes)` where:
+/// - `blocks` is a `Vec<Block>` of text/code/admonish/quiz‑reference blocks
+/// - `quizzes` is a `Vec<(String, String)>` of `(quiz_name, quiz_toml_content)` pairs
+///
+/// On error, returns a `String` describing what went wrong.
+pub fn build_blocks(content: &str) -> BlocksResult {
     let mut blocks = Vec::new();
     let mut quizzes = Vec::new();
     let mut current_content = String::new();
@@ -71,7 +83,7 @@ pub fn build_blocks(content: &str) -> Result<(Vec<Block>, Vec<(String, String)>)
     let mut current_quiz_name = String::new();
     let mut current_quiz_content = String::new();
 
-    for (_i, line) in content.lines().enumerate() {
+    for line in content.lines() {
         let line = line.trim_end();
 
         // Check for entering/exiting ignore blocks with --#--
@@ -134,14 +146,12 @@ pub fn build_blocks(content: &str) -> Result<(Vec<Block>, Vec<(String, String)>)
         }
 
         // Special handling for lines ending with --!
-        if line.ends_with("--!") {
+        if let Some(stripped) = line.strip_suffix("--!") {
             // Extract content without the --! suffix and trim trailing whitespace
-            let content = line[..line.len() - 3].trim_end().to_string();
-
+            let content = stripped.trim_end().to_string();
             // Add this line directly to the current content block
             current_content.push_str(&content);
             current_content.push('\n');
-
             continue; // Skip further processing for this line
         }
 
