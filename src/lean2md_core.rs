@@ -3,11 +3,16 @@ use std::io::Write;
 use std::path::Path;
 
 #[derive(Debug)]
+/// Represents a block of content extracted from a Lean file
 pub struct Block {
-    content: String,
-    is_code: bool,
-    is_admonish: bool,
-    quiz_reference: Option<String>,
+    /// The textual content of the block
+    pub content: String,
+    /// Whether this block represents code (true) or text (false)
+    pub is_code: bool,
+    /// Whether this block should be formatted as an admonish block
+    pub is_admonish: bool,
+    /// Optional reference to a quiz file
+    pub quiz_reference: Option<String>,
 }
 
 #[cfg(test)]
@@ -43,6 +48,15 @@ mod tests {
     }
 }
 
+/// Parses a Lean file content into blocks and quizzes
+///
+/// # Arguments
+///
+/// * `content` - String content of a Lean file
+///
+/// # Returns
+///
+/// Result containing a tuple of (blocks, quizzes) or an error message
 pub fn build_blocks(content: &str) -> Result<(Vec<Block>, Vec<(String, String)>), String> {
     let mut blocks = Vec::new();
     let mut quizzes = Vec::new();
@@ -350,7 +364,16 @@ fn merge_blocks(blocks: &[Block]) -> String {
     result.trim_end().to_string() + "\n"
 }
 
-// New function to recursively process directories
+/// Processes a directory of Lean files and converts them to Markdown
+///
+/// # Arguments
+///
+/// * `src_dir` - Path to the source directory containing Lean files
+/// * `tgt_dir` - Path to the target directory where Markdown files will be created
+///
+/// # Returns
+///
+/// Result containing `()` on success or an error message on failure
 pub fn process_directory(src_dir: &Path, tgt_dir: &Path) -> Result<(), Box<dyn std::error::Error>> {
     // Create the target directory if it doesn't exist
     fs::create_dir_all(tgt_dir)?;

@@ -2,6 +2,11 @@
 name = "lean2md"
 version = "0.1.0"
 edition = "2021"
+description = "Tool to convert Lean files to Markdown with special features for documentation"
+license = "MIT"
+repository = "https://github.com/fosterfarrell9/lean2md"
+keywords = ["lean", "markdown", "documentation", "converter"]
+categories = ["command-line-utilities", "development-tools"]
 
 [lib]
 name = "lean2md"
