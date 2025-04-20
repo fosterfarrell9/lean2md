@@ -152,7 +152,7 @@ tests/fixtures/
   ├── docstrings/
   ├── ignore_blocks/
   ├── markers/
-  ├── nedted_code/
+  ├── nested_code/
   └── quizzes/
 ```
 
