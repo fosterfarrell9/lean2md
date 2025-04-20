@@ -1,6 +1,6 @@
+use lean2md::process_directory;
 use std::env;
 use std::path::PathBuf;
-use lean2md::process_directory;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();

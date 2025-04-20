@@ -27,7 +27,10 @@ mod tests {
         // Print blocks for debugging
         println!("Number of blocks: {}", blocks.len());
         for (i, block) in blocks.iter().enumerate() {
-            println!("Block {}: is_code={}, content='{}'", i, block.is_code, block.content);
+            println!(
+                "Block {}: is_code={}, content='{}'",
+                i, block.is_code, block.content
+            );
         }
 
         assert_eq!(blocks.len(), 2);
@@ -133,7 +136,7 @@ pub fn build_blocks(content: &str) -> Result<(Vec<Block>, Vec<(String, String)>)
         // Special handling for lines ending with --!
         if line.ends_with("--!") {
             // Extract content without the --! suffix and trim trailing whitespace
-            let content = line[..line.len()-3].trim_end().to_string();
+            let content = line[..line.len() - 3].trim_end().to_string();
 
             // Add this line directly to the current content block
             current_content.push_str(&content);
@@ -171,37 +174,37 @@ pub fn build_blocks(content: &str) -> Result<(Vec<Block>, Vec<(String, String)>)
                 continue;
             }
 
-        // Check if this line contains the end of a comment block
-        if line.trim_end().ends_with("-/") && !line.contains("```") {
-            let is_admonish = line.ends_with("--+");
+            // Check if this line contains the end of a comment block
+            if line.trim_end().ends_with("-/") && !line.contains("```") {
+                let is_admonish = line.ends_with("--+");
 
-            // Add the content up to the -/ marker (removing the -/ itself)
-            if let Some(end_idx) = line.rfind("-/") {
-                // Only add the part before the -/ marker
-                current_content.push_str(&line[0..end_idx]);
-                current_content.push('\n');
+                // Add the content up to the -/ marker (removing the -/ itself)
+                if let Some(end_idx) = line.rfind("-/") {
+                    // Only add the part before the -/ marker
+                    current_content.push_str(&line[0..end_idx]);
+                    current_content.push('\n');
+                } else {
+                    // Fallback: add the whole line
+                    current_content.push_str(line);
+                    current_content.push('\n');
+                }
+
+                // Add the comment block
+                blocks.push(Block {
+                    content: current_content.trim().to_string(),
+                    is_code: false,
+                    is_admonish,
+                    quiz_reference: None,
+                });
+
+                in_comment_block = false;
+                current_content = String::new();
             } else {
-                // Fallback: add the whole line
+                // Just add the line as-is to the current comment block
                 current_content.push_str(line);
                 current_content.push('\n');
             }
-
-            // Add the comment block
-            blocks.push(Block {
-                content: current_content.trim().to_string(),
-                is_code: false,
-                is_admonish,
-                quiz_reference: None,
-            });
-
-            in_comment_block = false;
-            current_content = String::new();
-        } else {
-            // Just add the line as-is to the current comment block
-            current_content.push_str(line);
-            current_content.push('\n');
-        }
-        continue;
+            continue;
         }
 
         // Skip lines that end with --#
@@ -210,9 +213,7 @@ pub fn build_blocks(content: &str) -> Result<(Vec<Block>, Vec<(String, String)>)
         }
 
         // Check for docstring with --+ at the end (special admonish block)
-        if line.starts_with("/--") &&
-           line.contains("-/") &&
-           line.ends_with("--+") {
+        if line.starts_with("/--") && line.contains("-/") && line.ends_with("--+") {
             // Handle as a special admonish block
             if !current_content.trim().is_empty() {
                 blocks.push(Block {
@@ -250,7 +251,11 @@ pub fn build_blocks(content: &str) -> Result<(Vec<Block>, Vec<(String, String)>)
         }
 
         // Handle single-line comments that start and end on the same line
-        if line.starts_with("/-") && !line.starts_with("/--") && line.contains("-/") && !in_comment_block {
+        if line.starts_with("/-")
+            && !line.starts_with("/--")
+            && line.contains("-/")
+            && !in_comment_block
+        {
             // If we have accumulated code content, add it as a code block
             if !current_content.trim().is_empty() {
                 blocks.push(Block {
