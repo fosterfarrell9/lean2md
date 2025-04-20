@@ -25,7 +25,7 @@ mod tests {
             println!("Block {}: is_code={}, content='{}'", i, block.is_code, block.content);
         }
 
-        assert_eq!(blocks.len(), 2); // This will fail
+        assert_eq!(blocks.len(), 2);
     }
 
     #[test]
