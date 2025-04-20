@@ -152,7 +152,8 @@ tests/fixtures/
   ├── docstrings/
   ├── ignore_blocks/
   ├── markers/
-  └── nested_code/
+  ├── nedted_code/
+  └── quizzes/
 ```
 
 To add a new test case, create a new fixture directory with both input `.lean` and expected `.md` files, then add a test function in `integration_tests.rs` that calls `run_fixture_test()` with your fixture name.
