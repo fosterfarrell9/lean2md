@@ -62,12 +62,55 @@ cargo run -- <lean_src_dir> <md_tgt_dir>
 - `--#--`: Lines between two `--#--` markers are completely ignored
 - `--+`  at the end of a docstring: The docstring is formatted as an admonish block
 - `--!` at the end of a line: Forces the line to be included in the output even if it would normally be filtered out
+- `--@quiz:name` and `--@quiz-end`: Creates a quiz within a comment block that will be extracted to a TOML file in the `quizzes` directory and referenced in the Markdown with `{{#quiz ../quizzes/name.toml}}`
 
-### Comment handling:
+### Comment handling
 - Regular comments `/- ... -/`: Delimiters are removed in the output
 - Docstrings `/-- ... -/`: Delimiters are preserved in the output and included in code blocks (unless the docstring is followed by `--+`)
 
-Note: Marker precedence matters. Content within `--#--` ignore blocks will always be ignored, regardless of other markers like `--!`.
+### Quiz Support
+
+lean2md supports creating quizzes for the [mdbook-quiz](https://github.com/cognitive-engineering-lab/mdbook-quiz) preprocessor directly within Lean files:
+
+- Quizzes are defined inside comment blocks with `--@quiz:name` and `--@quiz-end` markers.
+- The content between markers is extracted verbatim (markers inside are preserved).
+- A TOML file is generated at `<parent_of_md_tgt_dir>/quizzes/name.toml`.
+- A reference `{{#quiz ../quizzes/name.toml}}` is added to the markdown output.
+- Inside the quiz block you should use the syntax required by `mdbook-quiz`. There are three types of questions provided by `mdbook-quiz`:
+  - **ShortAnswer**: For questions where the user inputs a text answer
+  - **MultipleChoice**: For questions with several options and one correct answer
+  - **Tracing**: Evaluates if code will compile using the Rust compiler. Note that this question type is not (yet) suitable for Lean code, as the quiz system will attempt to compile it with the Rust compiler.
+- In order for the quizzes to work, you need to have `mdbook-quiz` installed and added `[preprocessor.quiz]` to your `book.toml` file
+
+Example:
+```lean
+/-
+--@quiz:lean_basics
+[[questions]]
+type = "ShortAnswer"
+prompt.prompt = "What is the keyword for definitions in Lean?"
+answer.answer = "def"
+context = "For example, you can write: `def x := 5`."
+
+[[questions]]
+type = "MultipleChoice"
+prompt.prompt = "What symbol is used for type annotations in Lean?"
+prompt.distractors = [
+  "=>",
+  "->",
+  "=="
+]
+answer.answer = ":"
+context = """
+In Lean, we use the colon symbol to annotate types. For example: `def x : Nat := 5`
+"""
+--@quiz-end
+-/
+```
+
+### Notes and further examples
+
+Marker precedence matters. Content within `--#--` ignore blocks will always be ignored, regardless of other markers like `--!`. Markers inside quiz blocks will also be ignored.
 
 For concrete examples of how these features and markers work in practice, see the test fixtures in the `tests/fixtures/` directory. Each fixture contains input Lean files and their expected Markdown output, demonstrating how different markers and features behave.
 
@@ -109,7 +152,8 @@ tests/fixtures/
   ├── docstrings/
   ├── ignore_blocks/
   ├── markers/
-  └── nested_code/
+  ├── nested_code/
+  └── quizzes/
 ```
 
 To add a new test case, create a new fixture directory with both input `.lean` and expected `.md` files, then add a test function in `integration_tests.rs` that calls `run_fixture_test()` with your fixture name.
