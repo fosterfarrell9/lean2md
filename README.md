@@ -68,11 +68,19 @@ cargo run -- <lean_src_dir> <md_tgt_dir>
 
 ## Special Markers
 
-- `--#` at the end of a line: Ignores the entire line
+- `--#` at the end of a line: Ignores the entire line, regardless of context
 - `--#--`: Lines between two `--#--` markers are completely ignored
-- `--+`  at the end of a docstring: The docstring is formatted as an admonish block for use with the [mdbook-admonish](https://github.com/tommilligan/mdbook-admonish) preprocessor
+- `--+`  at the end of a docstring: The docstring is formatted as an admonish block for use with the [mdbook-admonish](https://github.com/tommilligan/mdbook-admonish) preprocessor. Works in any context including inside code blocks within comments.
 - `--!` at the end of a line: Forces the line to be included in the output even if it would normally be filtered out
 - `--@quiz:name` and `--@quiz-end`: Creates a quiz within a comment block that will be extracted to a TOML file in the `quizzes` directory and referenced in the Markdown with `{{#quiz ../quizzes/name.toml}}` for use with the [mdbook-quiz](https://github.com/cognitive-engineering-lab/mdbook-quiz) preprocessor
+
+### Marker Processing
+
+All markers are processed consistently, regardless of context. This means:
+- Markers work inside regular comments (`/- ... -/`)
+- Markers work inside docstrings (`/-- ... -/`)
+- Markers work inside code blocks within comments (```lean ... ```)
+- Marker precedence: `--!` (force include) takes precedence over `--#` (exclude)
 
 ### Comment handling
 
