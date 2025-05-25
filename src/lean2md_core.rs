@@ -170,8 +170,32 @@ pub fn build_blocks(content: &str) -> BlocksResult {
             continue;
         }
 
-        // When in a code example inside a comment, preserve everything as-is
+        // When in a code example inside a comment
         if in_comment_block && in_code_example {
+            // Check if this is a docstring line with --+ at the end
+            if line.starts_with("/--") && line.contains("-/") && line.ends_with("--+") {
+                // Extract content between /-- and -/ markers, removing the --+ suffix
+                let start_idx = 3; // Skip the "/--"
+                let end_idx = line.rfind("-/").unwrap();
+                if start_idx <= end_idx {
+                    // Create an admonish block
+                    let comment_text = &line[start_idx..end_idx];
+                    current_content.push_str("```\n\n"); // Close the code block
+
+                    // Add the admonish block
+                    current_content.push_str(
+                        "```admonish abstract collapsible = false, title = \"Docstring\"\n",
+                    );
+                    current_content.push_str(comment_text.trim());
+                    current_content.push_str("\n```\n\n");
+
+                    // Reopen the code block
+                    current_content.push_str("```lean\n");
+                    continue;
+                }
+            }
+
+            // Normal line in code example - preserve as-is
             current_content.push_str(line);
             current_content.push('\n');
             continue;

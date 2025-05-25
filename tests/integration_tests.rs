@@ -119,6 +119,11 @@ fn test_markers() {
 }
 
 #[test]
+fn test_markers_in_code_blocks() {
+    run_fixture_test("markers_in_code_blocks");
+}
+
+#[test]
 fn test_nested_code() {
     run_fixture_test("nested_code");
 }
