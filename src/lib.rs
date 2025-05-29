@@ -12,4 +12,4 @@
 mod lean2md_core; // Move core functionality to this module
 
 // Export public functions for other crates to use
-pub use lean2md_core::{build_blocks, process_directory, Block};
+pub use lean2md_core::{build_blocks, process_directory, process_file, Block};

@@ -1,6 +1,6 @@
 use std::fs::{self, File};
 use std::io::Write;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 /// A (quiz_name, quiz_content) pair.
 type Quiz = (String, String);
@@ -401,6 +401,56 @@ fn merge_blocks(blocks: &[Block]) -> String {
     }
 
     result.trim_end().to_string() + "\n"
+}
+
+/// Processes a single Lean file and converts it to Markdown
+///
+/// # Arguments
+///
+/// * `src_file` - Path to the source Lean file
+/// * `tgt_file` - Path to the target Markdown file
+///
+/// # Returns
+///
+/// Result containing `()` on success or an error message on failure
+pub fn process_file(src_file: &Path, tgt_file: &Path) -> Result<(), Box<dyn std::error::Error>> {
+    println!(
+        "Converting {} to {}",
+        src_file.display(),
+        tgt_file.display()
+    );
+
+    // Read the source file
+    let content = fs::read_to_string(src_file)?;
+
+    // Create parent directory for target file if it doesn't exist
+    if let Some(parent) = tgt_file.parent() {
+        fs::create_dir_all(parent)?;
+    }
+
+    // Create quizzes directory if needed
+    let quizzes_dir = match tgt_file.parent() {
+        Some(parent) => parent.join("quizzes"),
+        None => PathBuf::from("quizzes"),
+    };
+    fs::create_dir_all(&quizzes_dir)?;
+
+    // Process the content
+    let (blocks, quizzes) = build_blocks(&content)?;
+    let markdown = merge_blocks(&blocks);
+
+    // Write quiz files
+    for (name, content) in quizzes {
+        let quiz_path = quizzes_dir.join(format!("{}.toml", name));
+        let mut file = File::create(&quiz_path)?;
+        file.write_all(content.as_bytes())?;
+        println!("  Generated quiz: {}", quiz_path.display());
+    }
+
+    // Write the markdown file
+    fs::write(tgt_file, markdown)?;
+
+    Ok(())
 }
 
 /// Processes a directory of Lean files and converts them to Markdown

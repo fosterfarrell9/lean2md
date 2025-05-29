@@ -99,6 +99,78 @@ fn run_fixture_test(fixture_name: &str) {
 }
 
 #[test]
+fn test_single_file_conversion() {
+    // Create temporary directories
+    let temp_dir = tempfile::tempdir().unwrap();
+
+    // Create a test Lean file
+    let test_file = temp_dir.path().join("test_single.lean");
+    fs::write(&test_file, "/- Test comment -/\ndef example := 42").unwrap();
+
+    // Expected output file (same name with .md extension)
+    let expected_output = temp_dir.path().join("test_single.md");
+
+    // Run the program with single file argument
+    let output = std::process::Command::new("cargo")
+        .args(["run", "--", test_file.to_str().unwrap()])
+        .output()
+        .expect("Failed to execute process");
+
+    assert!(output.status.success(), "Command failed: {:?}", output);
+    assert!(expected_output.exists(), "Output file was not created");
+
+    // Verify content
+    let content = fs::read_to_string(expected_output).unwrap();
+    assert!(
+        content.contains("Test comment"),
+        "Output missing comment content"
+    );
+    assert!(
+        content.contains("def example := 42"),
+        "Output missing code content"
+    );
+}
+
+#[test]
+fn test_file_to_file_conversion() {
+    // Create temporary directories
+    let temp_in = tempfile::tempdir().unwrap();
+    let temp_out = tempfile::tempdir().unwrap();
+
+    // Create a test Lean file
+    let src_file = temp_in.path().join("input.lean");
+    fs::write(&src_file, "/- Another test -/\ndef another := 100").unwrap();
+
+    // Target file with different name
+    let tgt_file = temp_out.path().join("output.md");
+
+    // Run with explicit source and target
+    let output = std::process::Command::new("cargo")
+        .args([
+            "run",
+            "--",
+            src_file.to_str().unwrap(),
+            tgt_file.to_str().unwrap(),
+        ])
+        .output()
+        .expect("Failed to execute process");
+
+    assert!(output.status.success(), "Command failed: {:?}", output);
+    assert!(tgt_file.exists(), "Target file was not created");
+
+    // Verify content
+    let content = fs::read_to_string(tgt_file).unwrap();
+    assert!(
+        content.contains("Another test"),
+        "Output missing comment content"
+    );
+    assert!(
+        content.contains("def another := 100"),
+        "Output missing code content"
+    );
+}
+
+#[test]
 fn test_admonish() {
     run_fixture_test("admonish");
 }
