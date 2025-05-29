@@ -14,7 +14,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             // Case: lean2md <file.lean>
             let src = PathBuf::from(&args[1]);
 
-            if src.is_file() && src.extension().map_or(false, |ext| ext == "lean") {
+            if src.is_file() && src.extension().is_some_and(|ext| ext == "lean") {
                 let tgt = src.with_extension("md");
                 return process_file(&src, &tgt);
             }
