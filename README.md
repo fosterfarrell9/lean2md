@@ -41,13 +41,21 @@ You might consider adding the `target/relase` folder to your PATH to run `lean2m
 Basic usage:
 
 ```bash
-lean2md <lean_src_dir> <md_tgt_dir>     # Convert Lean files to Markdown
+lean2md <file.lean>                     # Convert a single file to <file.md>
+lean2md <lean_src_file> <md_tgt_file>   # Convert a specific file to a specific target
+lean2md <lean_src_dir> <md_tgt_dir>     # Convert all Lean files in a directory
 lean2md --version                       # Display version information
 ```
 
 Example:
 
 ```bash
+# Convert a single file
+lean2md MyModule.lean                   # Creates MyModule.md in the same directory
+
+# Convert a file to a specific location
+lean2md src/MyModule.lean docs/module.md
+
 # Convert all .lean files in the Geometry directory to .md files in the docs directory
 lean2md Geometry docs
 ```
@@ -55,7 +63,7 @@ lean2md Geometry docs
 When running with cargo:
 
 ```bash
-cargo run -- <lean_src_dir> <md_tgt_dir>
+cargo run -- -- <arguments>                # e.g., cargo run -- MyModule.lean
 ```
 
 ## Features
