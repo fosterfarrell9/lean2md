@@ -63,7 +63,7 @@ lean2md Geometry docs
 When running with cargo:
 
 ```bash
-cargo run -- -- <arguments>                # e.g., cargo run -- MyModule.lean
+cargo run -- <arguments>                # e.g., cargo run -- MyModule.lean
 ```
 
 ## Features

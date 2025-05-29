@@ -98,8 +98,6 @@ fn run_fixture_test(fixture_name: &str) {
     }
 }
 
-// Add these tests to tests/integration_tests.rs
-
 #[test]
 fn test_single_file_conversion() {
     // Create temporary directories
